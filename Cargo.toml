@@ -6,6 +6,7 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/rsolomo/json_logger"
 homepage = "https://github.com/rsolomo/json_logger"
+documentation = "http://rsolomo.github.io/json_logger/json_logger/index.html"
 description = """
 A JSON logging implementation.
 """
