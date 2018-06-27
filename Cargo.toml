@@ -12,7 +12,7 @@ A JSON logging implementation.
 """
 
 [dependencies]
-libc = "*"
-log = "*"
-rustc-serialize = "*"
-time = "*"
+libc = "0.2"
+log = "0.3"
+rustc-serialize = "0.3"
+time = "0.1"
