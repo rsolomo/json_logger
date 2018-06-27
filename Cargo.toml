@@ -1,12 +1,12 @@
 [package]
 name = "json_logger"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Ray Solomon <raybsolomon@gmail.com>"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/rsolomo/json_logger"
 homepage = "https://github.com/rsolomo/json_logger"
-documentation = "http://rsolomo.github.io/json_logger/json_logger/index.html"
+documentation = "https://docs.rs/json_logger/0.0.2/json_logger/"
 description = """
 A JSON logging implementation.
 """
