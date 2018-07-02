@@ -4,18 +4,26 @@
 //!
 //! ### Example
 //!
-//! ```rust,ignore
+//! ```rust
+//! #[macro_use]
+//! extern crate json_logger;
+//! #[macro_use]
+//! extern crate serde_json;
 //!
+//! use json_logger::Logger;
+//!
+//! fn main() {
+//!     let mut log = Logger::new("json_logger", ::std::io::stdout());
+//!     jl_info!(log, "baz", json!({"a":1, "b":2}));
+//!     jl_info!(log, "bar", json!({"a":3, "b":4}));
+//! }
 //! ```
 
 extern crate serde;
-
 #[macro_use]
 extern crate serde_derive;
-
 extern crate serde_json;
 extern crate time;
-
 #[cfg(windows)]
 extern crate winapi;
 
@@ -24,16 +32,33 @@ use std::io::Write;
 use std::process;
 
 mod hostname;
-
 #[macro_use]
 mod macros;
 
 const NEWLINE: &[u8; 1] = &[10];
 
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[repr(u8)]
+pub enum Level {
+    Trace = 10,
+    Debug = 20,
+    Info = 30,
+    Warn = 40,
+    Error = 50,
+    Fatal = 60,
+    Disabled = 255,
+}
+
+impl From<Level> for u8 {
+    fn from(level: Level) -> Self {
+        level as u8
+    }
+}
+
 #[derive(Debug)]
 pub struct Logger<W: Write> {
     writer: W,
-    log_level: u8,
+    level: u8,
     name: String,
     hostname: String,
     pid: u32,
@@ -43,13 +68,22 @@ impl<W: Write> Logger<W> {
     pub fn new<S: Into<String>>(name: S, writer: W) -> Self {
         Logger {
             writer,
-            log_level: 30,
+            level: 30,
             name: name.into(),
             hostname: hostname::hostname(),
             pid: process::id(),
         }
     }
-    pub fn log<T: Serialize>(&mut self, record: __Record<T>) {
+    pub fn set_minimum_level<T: Into<u8>>(&mut self, level: T) {
+        self.level = level.into()
+    }
+    pub fn is_enabled<T: Into<u8>>(&self, level: T) -> bool {
+        self.level <= level.into()
+    }
+    pub fn log<T: Serialize>(&mut self, record: Record<T>) {
+        if !self.is_enabled(record.level) {
+            return
+        }
         let serializable_record = SerializableRecord {
             data: record.data,
             name: self.name.as_str(),
@@ -61,13 +95,24 @@ impl<W: Write> Logger<W> {
             time: &time::now_utc().rfc3339().to_string(),
             v: 0,
         };
-        let result = {
-            serde_json::to_writer(&mut self.writer, &serializable_record)
-        };
-        if result.is_ok() {
+        if serde_json::to_writer(&mut self.writer, &serializable_record).is_ok() {
             let _ = self.writer.write_all(NEWLINE);
-        };
+        }
     }
+}
+
+pub struct Record<'a, T: Serialize> {
+    pub data: Option<T>,
+    pub level: u8,
+    pub msg: &'a str,
+    pub src: Src<'a>,
+}
+
+#[derive(Serialize)]
+pub struct Src<'a> {
+    pub module_path: &'a str,
+    pub file: &'a str,
+    pub line: u32,
 }
 
 #[derive(Serialize)]
@@ -79,21 +124,7 @@ struct SerializableRecord<'a, T: Serialize> {
     msg: &'a str,
     name: &'a str,
     pid: u32,
-    src: __Src,
+    src: Src<'a>,
     time: &'a str,
     v: u8
-}
-
-pub struct __Record<'a, T: Serialize> {
-    pub data: Option<T>,
-    pub level: u8,
-    pub msg: &'a str,
-    pub src: __Src,
-}
-
-#[derive(Serialize)]
-pub struct __Src {
-    pub module_path: &'static str,
-    pub file: &'static str,
-    pub line: u32,
 }

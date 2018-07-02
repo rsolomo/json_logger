@@ -21,7 +21,7 @@ unsafe fn gethostname(name: *mut c_char, size: usize) -> c_int {
 }
 
 pub fn hostname() -> String {
-    let mut buf = [0u8; 255];
+    let mut buf = [0u8; 256];
     let ptr = buf.as_mut_ptr() as *mut c_char;
     unsafe {
         if gethostname(ptr, buf.len()) != 0 {
