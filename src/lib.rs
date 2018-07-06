@@ -14,8 +14,8 @@
 //!
 //! fn main() {
 //!     let mut log = Logger::new("json_logger", ::std::io::stdout());
-//!     jl_info!(log, "baz", json!({"a":1, "b":2}));
-//!     jl_info!(log, "bar", json!({"a":3, "b":4}));
+//!     json_info!(log, "baz", json!({"a":1, "b":2}));
+//!     json_info!(log, "bar", json!({"a":3, "b":4}));
 //! }
 //! ```
 
@@ -35,7 +35,7 @@ mod hostname;
 #[macro_use]
 mod macros;
 
-const NEWLINE: &[u8; 1] = &[10];
+const NEWLINE: u8 = 10;
 
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[repr(u8)]
@@ -95,9 +95,10 @@ impl<W: Write> Logger<W> {
             time: &time::now_utc().rfc3339().to_string(),
             v: 0,
         };
-        if serde_json::to_writer(&mut self.writer, &serializable_record).is_ok() {
-            let _ = self.writer.write_all(NEWLINE);
-        }
+        if let Ok(mut bytes) = serde_json::to_vec(&serializable_record) {
+            bytes.push(NEWLINE);
+            let _ = self.writer.write_all(&bytes);
+        };
     }
 }
 

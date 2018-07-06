@@ -7,6 +7,6 @@ use json_logger::Logger;
 
 fn main() {
     let mut log = Logger::new("stderr", ::std::io::stderr());
-    jl_info!(log, "baz", json!({"a":1, "b":2}));
-    jl_info!(log, "bar", json!({"a":3, "b":4}));
+    json_info!(log, "baz", json!({"a":1, "b":2}));
+    json_info!(log, "bar", json!({"a":3, "b":4}));
 }

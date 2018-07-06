@@ -26,7 +26,7 @@ fn log() {
     let mut buffer: Vec<u8> = vec![];
     {
         let mut log = Logger::new("json_logger", &mut buffer);
-        jl_log!(log, "baz", 30);
+        json_log!(log, "baz", 30);
     }
     let actual: Record = serde_json::from_slice(&buffer).unwrap();
 
@@ -48,7 +48,7 @@ fn log_with_data() {
     let mut buffer: Vec<u8> = vec![];
     {
         let mut log = Logger::new("json_logger", &mut buffer);
-        jl_log!(log, "baz", 40, Data {a: "1", b: 2});
+        json_log!(log, "baz", 40, Data {a: "1", b: 2});
     }
     let value: Value = serde_json::from_slice(&buffer).unwrap();
     let actual = value.pointer("/data").unwrap().as_object().unwrap();
@@ -63,13 +63,13 @@ fn log_level_macros() {
     {
         let mut log = Logger::new("json_logger", &mut buffer);
         log.set_minimum_level(Level::Trace);
-        jl_fatal!(log, "test");
-        jl_error!(log, "test");
-        jl_warn!(log, "test");
-        jl_info!(log, "test");
-        jl_debug!(log, "test");
-        jl_trace!(log, "test");
-        jl_log!(log, "test", 30);
+        json_fatal!(log, "test");
+        json_error!(log, "test");
+        json_warn!(log, "test");
+        json_info!(log, "test");
+        json_debug!(log, "test");
+        json_trace!(log, "test");
+        json_log!(log, "test", 30);
     }
     let s = str::from_utf8(&buffer).unwrap();
     let json_iterator = s.split_terminator('\n');
@@ -90,13 +90,13 @@ fn set_minimum_level() {
     {
         let mut log = Logger::new("json_logger", &mut buffer);
         log.set_minimum_level(Level::Info);
-        jl_info!(log, "visible");
-        jl_trace!(log, "not visible");
+        json_info!(log, "visible");
+        json_trace!(log, "not visible");
         log.set_minimum_level(Level::Error);
-        jl_info!(log, "not visible");
-        jl_fatal!(log, "visible");
+        json_info!(log, "not visible");
+        json_fatal!(log, "visible");
         log.set_minimum_level(Level::Disabled);
-        jl_fatal!(log, "not visible");
+        json_fatal!(log, "not visible");
     }
     let s = str::from_utf8(&buffer).unwrap();
     let json_iterator = s.split_terminator('\n');

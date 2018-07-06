@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! jl_log {
+macro_rules! json_log {
     ($logger:expr, $msg:expr, $level:expr, $data:expr) => {{
         {
             let src = $crate::Src {
@@ -10,7 +10,7 @@ macro_rules! jl_log {
             let record = $crate::Record {
                 data: Some($data),
                 level: $level,
-                msg: $msg,
+                msg: $msg.as_ref(),
                 src: src,
             };
             $logger.log(record)
@@ -26,7 +26,7 @@ macro_rules! jl_log {
             let record = $crate::Record {
                 data: None as Option<()>,
                 level: $level,
-                msg: $msg,
+                msg: $msg.as_ref(),
                 src: src,
             };
             $logger.log(record)
@@ -35,61 +35,61 @@ macro_rules! jl_log {
 }
 
 #[macro_export]
-macro_rules! jl_fatal {
+macro_rules! json_fatal {
     ($logger:expr, $msg:expr, $data:expr) => {{
-        jl_log!($logger, $msg, 60, $data)
+        json_log!($logger, $msg, 60, $data)
     }};
     ($logger:expr, $msg:expr) => {{
-        jl_log!($logger, $msg, 60)
+        json_log!($logger, $msg, 60)
     }};
 }
 
 #[macro_export]
-macro_rules! jl_error {
+macro_rules! json_error {
     ($logger:expr, $msg:expr, $data:expr) => {{
-        jl_log!($logger, $msg, 50, $data)
+        json_log!($logger, $msg, 50, $data)
     }};
     ($logger:expr, $msg:expr) => {{
-        jl_log!($logger, $msg, 50)
+        json_log!($logger, $msg, 50)
     }};
 }
 
 #[macro_export]
-macro_rules! jl_warn {
+macro_rules! json_warn {
     ($logger:expr, $msg:expr, $data:expr) => {{
-        jl_log!($logger, $msg, 40, $data)
+        json_log!($logger, $msg, 40, $data)
     }};
     ($logger:expr, $msg:expr) => {{
-        jl_log!($logger, $msg, 40)
+        json_log!($logger, $msg, 40)
     }};
 }
 
 #[macro_export]
-macro_rules! jl_info {
+macro_rules! json_info {
     ($logger:expr, $msg:expr, $data:expr) => {{
-        jl_log!($logger, $msg, 30, $data)
+        json_log!($logger, $msg, 30, $data)
     }};
     ($logger:expr, $msg:expr) => {{
-        jl_log!($logger, $msg, 30)
+        json_log!($logger, $msg, 30)
     }};
 }
 
 #[macro_export]
-macro_rules! jl_debug {
+macro_rules! json_debug {
     ($logger:expr, $msg:expr, $data:expr) => {{
-        jl_log!($logger, $msg, 20, $data)
+        json_log!($logger, $msg, 20, $data)
     }};
     ($logger:expr, $msg:expr) => {{
-        jl_log!($logger, $msg, 20)
+        json_log!($logger, $msg, 20)
     }};
 }
 
 #[macro_export]
-macro_rules! jl_trace {
+macro_rules! json_trace {
     ($logger:expr, $msg:expr, $data:expr) => {{
-        jl_log!($logger, $msg, 10, $data)
+        json_log!($logger, $msg, 10, $data)
     }};
     ($logger:expr, $msg:expr) => {{
-        jl_log!($logger, $msg, 10)
+        json_log!($logger, $msg, 10)
     }};
 }
