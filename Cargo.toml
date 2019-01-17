@@ -13,6 +13,6 @@ A JSON logging implementation.
 
 [dependencies]
 libc = "0.2"
-log = "0.3"
+log = { version = "0.4", features = ["std"] }
 rustc-serialize = "0.3"
 time = "0.1"
